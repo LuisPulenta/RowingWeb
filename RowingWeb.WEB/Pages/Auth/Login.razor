@@ -3,46 +3,109 @@
 @inject SweetAlertService sweetAlertService
 @inject NavigationManager navigationManager
 @using RowingWeb.Shared.DTOs
+@using RowingWeb.Shared.Responses
 
-<h3>Iniciar Sesión</h3>
 
-<EditForm Model="loginDTO" OnValidSubmit="LoginAsync">
-    <DataAnnotationsValidator />
+@if (loading)
+{
+    <div class="spinner" />
+}
+else
+{
+    <div/>
+}
 
-    <div class="row">
-        <div class="col-4">
-            <div class="mb-3">
-                <label>Email:</label>
-                <div>
-                    <InputText class="form-control" @bind-Value="@loginDTO.Usuario" />
-                    <ValidationMessage For="@(() => loginDTO.Usuario)" />
+
+
+<div class="container d-flex justify-content-center align-items-center " style="height: 100vh">
+
+<div class="row">
+    <div class="col">
+
+
+        <EditForm Model="loginDTO" OnValidSubmit="LoginAsync">
+            <DataAnnotationsValidator />
+
+            <div class="card bg-light">
+                <div class="card-header">
+                    <span>
+                        <i class="oi oi-account-login" /> Iniciar Sesión
+                        <button class="btn btn-sm btn-primary float-end" type="submit"><i class="oi oi-check" /> Conectar</button>
+                    </span>
+                </div>
+                <div class="card-body">
+
+
+                    <div class="mb-3">
+                        <label>Usuario:</label>
+                        <div>
+                            <InputText class="form-control" @bind-Value="@loginDTO.Usuario" />
+                            <ValidationMessage For="@(() => loginDTO.Usuario)" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label>Contraseña:</label>
+                        <div>
+                            <InputText type="password" class="form-control" @bind-Value="@loginDTO.Password" />
+                            <ValidationMessage For="@(() => loginDTO.Password)" />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="mb-3">
-                <label>Contraseña:</label>
-                <div>
-                    <InputText type="password" class="form-control" @bind-Value="@loginDTO.Password" />
-                    <ValidationMessage For="@(() => loginDTO.Password)" />
-                </div>
-            </div>
-            <button class="btn btn-primary" type="submit">Iniciar Sesión</button>
-        </div>
+        </EditForm>
+
     </div>
-</EditForm>
+</div>
+</div>
+
 
 @code {
+    public UsuarioAppResponse? Usuario { get; set; }
     private LoginDTO loginDTO = new();
+    private bool loading;
 
     private async Task LoginAsync()
     {
-        // var responseHttp = await repository.Post<LoginDTO, TokenDTO>("/api/accounts/Login", loginDTO);
-        // if (responseHttp.Error)
-        // {
-        //     var message = await responseHttp.GetErrorMessage();
-        //     await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-        //     return;
-        // }
-        // await loginService.LoginAsync(responseHttp.Response!.Token);
+        loading = true;
+        
+        var responseHttp = await repository.Post<LoginDTO, UsuarioAppResponse>("/api/usuarios/GetUserByUsuario", loginDTO);
+        
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessage();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            loading = false;
+            return;
+        }
+
+        Usuario = responseHttp.Response!;
+
+        if (Usuario == null)
+        {
+            await sweetAlertService.FireAsync("Error", "El Usuario no existe", SweetAlertIcon.Error);
+            loading = false;
+            return;
+        }
+
+        if (Usuario.Contrasena.ToLower() != loginDTO.Password.ToLower())
+        {
+            await sweetAlertService.FireAsync("Error", "Contraseña no válida", SweetAlertIcon.Error);
+            loading = false;
+            return;
+        }
+
+        loading = false;
+
+        // var toast = sweetAlertService.Mixin(new SweetAlertOptions
+        //     {
+        //         Toast = true,
+        //         Position = SweetAlertPosition.Center,
+        //         ShowConfirmButton = true,
+        //         Timer = 5000
+        //     });
+
+        // await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Ingreso exitoso al Sistema!!");
+
         navigationManager.NavigateTo("/");
     }
 }

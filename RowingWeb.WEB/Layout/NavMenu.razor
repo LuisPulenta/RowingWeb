@@ -7,13 +7,20 @@
     </div>
 </div>
 
+
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+
+        <div class="nav-item px-3">
+            <img src="img/logo.png" alt="Logo" width="230" />
+        </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/obras">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Obras

@@ -29,7 +29,12 @@ namespace RowingWeb.API.Controllers
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                queryable = queryable.Where(x => x.NombreObra!.ToLower().Contains(pagination.Filter.ToLower()));
+                queryable = queryable.Where(x => x.NombreObra!.ToLower().Contains(pagination.Filter.ToLower())
+                || x.ELEMPEP!.ToLower().Contains(pagination.Filter.ToLower())
+                || x.CodigoEstado!.ToLower().Contains(pagination.Filter.ToLower())
+                || x.CodigoSubEstado!.ToLower().Contains(pagination.Filter.ToLower())
+
+                );
             }
 
 
@@ -51,7 +56,10 @@ namespace RowingWeb.API.Controllers
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                queryable = queryable.Where(x => x.NombreObra!.ToLower().Contains(pagination.Filter.ToLower()));
+                queryable = queryable.Where(x => x.NombreObra!.ToLower().Contains(pagination.Filter.ToLower())
+                || x.ELEMPEP!.ToLower().Contains(pagination.Filter.ToLower())
+                || x.CodigoEstado!.ToLower().Contains(pagination.Filter.ToLower())
+                || x.CodigoSubEstado!.ToLower().Contains(pagination.Filter.ToLower()));
             }
 
             double count = await queryable.CountAsync();

@@ -2,8 +2,11 @@
 @inject IRepository repository
 @inject SweetAlertService sweetAlertService
 @inject NavigationManager navigationManager
+@inject ILoginService loginService
+@using Newtonsoft.Json
 @using RowingWeb.Shared.DTOs
 @using RowingWeb.Shared.Responses
+@using RowingWeb.WEB.Auth
 
 
 @if (loading)
@@ -67,9 +70,9 @@ else
     private async Task LoginAsync()
     {
         loading = true;
-        
+
         var responseHttp = await repository.Post<LoginDTO, UsuarioAppResponse>("/api/usuarios/GetUserByUsuario", loginDTO);
-        
+
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessage();
@@ -105,6 +108,10 @@ else
         //     });
 
         // await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Ingreso exitoso al Sistema!!");
+
+        var usertxt = JsonConvert.SerializeObject(Usuario);
+
+        await loginService.GuardarValor("usuario",usertxt);
 
         navigationManager.NavigateTo("/");
     }

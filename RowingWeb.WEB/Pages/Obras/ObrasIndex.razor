@@ -1,5 +1,8 @@
 ﻿@page "/obras"
+@using Newtonsoft.Json
+@using RowingWeb.WEB.Auth
 @inject IRepository repository
+@inject ILoginService loginService
 
 @if (Obras is null)
 {
@@ -71,6 +74,7 @@ else
 
 @code {
     public List<Obra>? Obras { get; set; }
+    public Usuario? Usuario { get; set; }
     private int currentPage = 1;
     private int totalPages;
 
@@ -96,6 +100,11 @@ else
 
     private async Task LoadAsync(int page = 1)
     {
+
+        string usertxt = await loginService.RecuperarValor("usuario");
+
+        Usuario = JsonConvert.DeserializeObject<Usuario>(usertxt);
+
         if (!string.IsNullOrWhiteSpace(Page))
         {
             page = Convert.ToInt32(Page);
